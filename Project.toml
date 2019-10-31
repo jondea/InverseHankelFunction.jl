@@ -1,0 +1,15 @@
+name = "InverseHankelFunction"
+uuid = "bec4b5d4-d8c4-11e9-2b25-9be465e100f1"
+authors = ["jondea <jondea@thedeakin.net>"]
+version = "0.1.0"
+
+[deps]
+IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
+LambertW = "984bce1d-4616-540c-a9ee-88d1112d94c9"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
