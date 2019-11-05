@@ -20,13 +20,15 @@ include("utils.jl")
             @test all(isapprox.(small_arg_hankelh1.(11, small_values), hankelh1.(11, small_values); rtol=1e-5))
         end
 
-        # Test whether f⁻¹ f = identity for different Hankel order (n) and solution branches (b)
+        # Test whether f f⁻¹ = identity for different Hankel order (n) and solution branches (b)
+        # We apply f⁻¹ first because action of f elliminates effect of branch
         @testset "f f⁻¹(z) = z" begin
-            testvec = small_values
             for n in [0,1,2,4,8,11]
                 for b in [0,1,2,3,4,5,10,11]
                     f   = z->   small_arg_hankelh1(n, z)
                     invf = z->inv_small_arg_hankelh1(n, z, b)
+                    # f is small argument asymptotic, so f(small_values) should be in domain of invf
+                    testvec = f.(small_values)
                     if !all(isapprox.((f  ∘ invf).(testvec), testvec; rtol=1e-5))
                         @show n, b, abs.(((f  ∘ invf).(testvec) .- testvec)./testvec)
                     end
@@ -51,13 +53,15 @@ include("utils.jl")
             @test all(isapprox.(large_arg_hankelh1.(8, large_values), hankelh1.(8, large_values); rtol=1e-4))
         end
     
-        # Test whether f⁻¹ f = identity for different Hankel order (n) and solution branches (b)
+        # Test whether f f⁻¹ = identity for different Hankel order (n) and solution branches (b)
+        # We apply f⁻¹ first because action of f elliminates effect of branch
         @testset "f f⁻¹(z) = z" begin
-            testvec = large_values
             for n in [0,1,2,4,8,11]
                 for b in [0,1,2,3]
                     f   = z->   large_arg_hankelh1(n, z)
                     invf = z->inv_large_arg_hankelh1(n, z, b)
+                    # f is large argument asymptotic, so f(large_values) should be in domain of invf
+                    testvec = f.(large_values)
                     diffvec = abs.((f  ∘ invf).(testvec) .- testvec)
                     if !all(isapprox.((f  ∘ invf).(testvec), testvec; rtol=1e-5))
                         @show n, b, testvec, invf.(testvec), (f  ∘ invf).(testvec)

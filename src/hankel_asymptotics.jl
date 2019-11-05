@@ -16,7 +16,7 @@ The small argument (`z`) asymptotic of `hankelh1`
 function small_arg_hankelh1(ν::Integer, z::Number)
 # function f(ν::Integer, z::Number)
     if iszero(ν)
-        # Range: whole real line, imaginary part >= -2 and =< 2
+        # Range: whole imaginary line, real part >= 1-2 and =< 1+2
         return  1 + 2im/π * log(z)
     else
         # Range: whole complex plane
@@ -34,8 +34,8 @@ Not valid for b > ν
 """
 function inv_small_arg_hankelh1(ν::Integer, h::Complex{T}, b::Integer) where T
     if iszero(ν)
-        if (abs(imag(h)) > 2) # Outside of the range of the function we are inverting, therefore a domain error
-            throw(DomainError(h, "For inv_small_arg_hankelh1(0, h, b), h must have imaginary part less than 2."))
+        if (real(h) > 3 || real(h) < -1) # Outside of the range of the function we are inverting, therefore a domain error
+            throw(DomainError(h, "For inv_small_arg_hankelh1(0, h, b), -1 < real(h) < 3"))
         end
         return exp((h-1)*π/2im)
     else
@@ -62,7 +62,8 @@ The `b`th branch of the inverse of the large argument (`z`) asymptotic of `hanke
 function inv_large_arg_hankelh1(ν::Integer, h::Number, b::Integer)
     # Prefactor in Hankel asymptotic
     C = sqrt(2/π) * exp(im*(- (ν*π)/2 - π/4))
-    return (im/2) * lambertw(-2im * (h/C)^(-2), b)
+    # Even branches of LambertW don't seem to work, use 2b+1, investigate further
+    return (im/2) * lambertw(-2im * (h/C)^(-2), 2b+1)
 end
     
 # Version using logs, is the first order approximation of LambertW form
