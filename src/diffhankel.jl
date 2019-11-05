@@ -31,8 +31,8 @@ WARNING: BROKEN
 function diff3hankelh1(ν, z)
     h = hankelh1(ν, z)
     hm1 = hankelh1(ν-1, z)
-    hm2 = = hankelh1(ν-2, z)
-    hm3 = = hankelh1(ν-3, z)
+    hm2 = hankelh1(ν-2, z)
+    hm3 = hankelh1(ν-3, z)
     hp = hm1-ν/z*h
     hm1p = hm2-(ν-1)/z*hm1
     hpp = hm1p -ν/z*hp + ν/z^2*h
