@@ -1,6 +1,7 @@
 using InverseHankelFunction
 import Test: @test, @testset
 import SpecialFunctions: hankelh1
+import BenchmarkTools: @benchmark
 
 include("utils.jl")
 
@@ -71,6 +72,26 @@ include("utils.jl")
             end
         end
     
+    end
+
+end
+
+@testset "Inverse Normalised Hankel function" begin
+
+    @testset "Sorted Vec optimisation" begin
+
+        hbars = 1.0:-0.01:0.01
+        for z₀ in [1.0, 2.0, 4.0]
+            for ν in [0, 1, 4]
+                # Test that the optimised and unoptimise dversion give the same result
+                @test invnormalisedhankelh1.(ν, hbars, z₀) ≈ invnormalisedhankelh1_sortedvec(ν, hbars, z₀)
+                # Test that optimised version is faster
+                b1 = @benchmark invnormalisedhankelh1.($ν, $hbars, $z₀) samples=10 evals=1
+                b2 = @benchmark invnormalisedhankelh1_sortedvec($ν, $hbars, $z₀) samples=10 evals=1
+                @test minimum(b2.times) <= minimum(b1.times)
+            end
+        end
+
     end
 
 end

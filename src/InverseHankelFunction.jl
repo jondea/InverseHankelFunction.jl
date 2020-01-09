@@ -5,7 +5,9 @@ import LambertW: lambertw
 
 export invhankelh1, PassingThrough
 
-export normalisedhankelh1, invnormalisedhankelh1
+export normalisedhankelh1,
+       invnormalisedhankelh1,
+       invnormalisedhankelh1_sortedvec
 
 export hankel_arg_asymptotic_scale,
        small_arg_hankelh1,

@@ -54,13 +54,25 @@ function invnormalisedhankelh1(ν, hbar::Number, z₀::Number)
         show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
 end
 
+# vector version which reuses 
+function invnormalisedhankelh1_sortedvec(ν, hbars::AbstractVector{<:Real}, z₀::Number)
+    zs = similar(hbars, complex(eltype(hbars)))
+    z = z₀
+    hbar_prev = one(eltype(hbars))
+    for (i,hbar) in enumerate(hbars)
+        z = invnormalisedhankel_adaptive_solve(ν, z₀, hbar, z, hbar_prev)
+        zs[i] = z
+        hbar_prev = hbar
+    end
+    return zs
+end
 
 # function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ::Number)
 #     nh_fnc = normalisedhankelh1(ν, z₀)
 #     invnormalisedhankel_adaptive_solve(nh_fnc::Function, ξ::Number)
 # end
 
-function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number; householder_order=2, ε=1.0e-12,
+function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=z₀, ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
     show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
 
     h₀ = hankelh1(ν, z₀)
@@ -68,10 +80,8 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
     # Last resort kill switch
     overall_iter = 0
 
-    # Start at z₀, where ξ = 1
-    ξ = one(ξ_target)
-    ζ = 0
-    z = z₀ + ζ
+    # Start at z and ξ
+    ζ = z - z₀
 
     h = hankelh1(ν, z)
     h_ν_minus_1 = hankelh1(ν-1, z)
