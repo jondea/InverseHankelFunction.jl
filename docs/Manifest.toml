@@ -105,12 +105,6 @@ git-tree-sha1 = "4214b48a62eb8f2c292b2ee34a508c256c0cdbc9"
 uuid = "8197267c-284f-5f27-9208-e0e47529a953"
 version = "0.3.2"
 
-[[InverseHankelFunction]]
-deps = ["IntervalSets", "LambertW", "SpecialFunctions"]
-path = "/home/jondea/InverseHankelFunction"
-uuid = "bec4b5d4-d8c4-11e9-2b25-9be465e100f1"
-version = "0.1.0"
-
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
