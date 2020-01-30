@@ -5,8 +5,8 @@ import BenchmarkTools: @benchmark
 
 include("utils.jl")
 
-@testset "Hankel function asymptotics" begin
-    
+@testset "Hankel function asymptotics       " begin
+
     @testset "Small argument" begin
 
         # Some small values to test our small argument asymptotics
@@ -37,11 +37,11 @@ include("utils.jl")
                 end
             end
         end
-        
+
     end
 
     @testset "Large argument" begin
-    
+
         # Some large values to test our large argument asymptotics
         large_values = [1.0e8+0im, 1.0e8+0.5im, 1.0e8-0.5im]
 
@@ -53,7 +53,7 @@ include("utils.jl")
             @test all(isapprox.(large_arg_hankelh1.(4, large_values), hankelh1.(4, large_values); rtol=1e-4))
             @test all(isapprox.(large_arg_hankelh1.(8, large_values), hankelh1.(8, large_values); rtol=1e-4))
         end
-    
+
         # Test whether f f⁻¹ = identity for different Hankel order (n) and solution branches (b)
         # We apply f⁻¹ first because action of f elliminates effect of branch
         @testset "f f⁻¹(z) = z" begin
@@ -71,7 +71,7 @@ include("utils.jl")
                 end
             end
         end
-    
+
     end
 
 end
@@ -96,3 +96,37 @@ end
 
 end
 
+@testset "Derivatives of Hankel functions   " begin
+
+    for ν in [0, 1, 4, 10]
+        for z in [1.0+0.0im, -1.0+0.1im, 0.0+2.0im, 0.0-2.0im, 100.0+5.0im]
+
+            findiff(f, δ=1e-8) = (f(ν, z+δ) .- f(ν, z))./δ
+
+            # Cache values
+            h = hankelh1(ν, z)
+            hm1 = hankelh1(ν-1, z)
+
+             hp1               = diffhankelh1( ν, z, h, hm1)
+            (hp2, hpp2)        = diff2hankelh1(ν, z, h, hm1)
+            (hp3, hpp3, hppp3) = diff3hankelh1(ν, z, h, hm1)
+
+            # Test they are consistent
+            @test hp1 ≈ hp2
+            @test hp2 ≈ hp3
+            @test hp3 ≈ hp1
+            @test hpp2 ≈ hpp3
+
+            # Test optional arguments don't matter
+            @test diffhankelh1(ν, z, h, hm1) == diffhankelh1(ν, z)
+            @test diff2hankelh1(ν, z, h, hm1) == diff2hankelh1(ν, z)
+            @test diff3hankelh1(ν, z, h, hm1) == diff3hankelh1(ν, z)
+
+            # Test the derivatives are similar to naive finite difference
+            @test diffhankelh1(ν,z)[1]  ≈ findiff(hankelh1)         rtol=1e-6
+            @test diff2hankelh1(ν,z)[2] ≈ findiff(diffhankelh1)[1]  rtol=1e-6
+            @test diff3hankelh1(ν,z)[3] ≈ findiff(diff2hankelh1)[2] rtol=1e-6
+        end
+    end
+
+end
