@@ -12,7 +12,7 @@ function invhankelh1(ν::Integer, h::Number, b::Integer)
     SMALL_ARGUMENT_THRESHOLD = 0.5
     LARGE_ARGUMENT_THRESHOLD = 2
     if hankel_arg_asymptotic_scale(ν, z) < SMALL_ARGUMENT_THRESHOLD
-        z = inv_small_arg_hankelh1()
+        z = inv_small_arg_hankelh1(ν, h, b)
     elseif hankel_arg_asymptotic_scale(ν, z) > LARGE_ARGUMENT_THRESHOLD
         z = inv_large_arg_hankelh1()
     end

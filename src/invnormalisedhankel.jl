@@ -22,9 +22,9 @@ normalisedhankelh1(ν, z₀) = NormalisedHankelH1(ν, hankeh1(ν, z₀))
 
 # "The gradient of the field as an ODE"
 # dtν_dt(field::Field) = - hankel(nh.ν, z) / diffhankelh1(nh.ν, z)
-# 
+#
 # dtν_dν(nh::NormalisedHankelH1, z)::Complex = - nh.h₀ / diffhankelh1(nh.ν, z)
-# 
+#
 # dtν_dξ(nh::NormalisedHankelH1, z)::Complex = nh.h₀ / diffhankelh1(nh.ν, z)
 
 @doc raw"""
@@ -54,7 +54,7 @@ function invnormalisedhankelh1(ν, hbar::Number, z₀::Number)
         show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
 end
 
-# vector version which reuses 
+# vector version which reuses
 function invnormalisedhankelh1_sortedvec(ν, hbars::AbstractVector{<:Real}, z₀::Number)
     zs = similar(hbars, complex(eltype(hbars)))
     z = z₀
@@ -116,7 +116,7 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
 
         # Predictor step in ζ or z using tangent (Euler)
         # ζ = ζ_prev + ξ_step*dζ_dξ
-        
+
         ζ = ζ_prev
 
         # Calculate new point (z) and hankel function/its derivatives at new point
@@ -133,7 +133,7 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
             dresidual_dζ = dh_dζ/h₀
             δ = - residual/dresidual_dζ
 
-            
+
             if householder_order == 1
                 ζ = ζ + δ
             elseif householder_order == 2
@@ -150,7 +150,7 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
             else
                 error("Householder order $householder_order not implemented. Use 1, 2 or 3.")
             end
-    
+
             # Calculate new point (z) and hankel function/its derivatives at new point
             z = z₀ + ζ
             h = hankelh1(ν, z)
@@ -187,7 +187,7 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
             ζ_prev = ζ
             ξ_prev = ξ
         else
-            
+
             # Reject the step and reduce step size
             # Go back to previous
             dζ_dξ = dζ_dξ_prev
@@ -202,4 +202,3 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
 
     return z
 end
-

@@ -30,4 +30,3 @@ function makeplots()
     plot_hankel_with_approx(2, plots_dir)
 
 end
-

@@ -65,7 +65,7 @@ function inv_large_arg_hankelh1(ν::Integer, h::Number, b::Integer)
     # Even branches of LambertW don't seem to work, use 2b+1, investigate further
     return (im/2) * lambertw(-2im * (h/C)^(-2), 2b+1)
 end
-    
+
 # Version using logs, is the first order approximation of LambertW form
 # "Inverse of hankel function using large argument asymptotic form"
 # function inv_large_arg_hankelh1(ν::Integer, h::Number, b::Integer)

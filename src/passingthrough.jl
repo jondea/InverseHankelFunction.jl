@@ -31,12 +31,12 @@ function invhankelh1(ν::Integer, h::Number, p::PassingThrough)
     SMALL_ARGUMENT_THRESHOLD = 0.5
     LARGE_ARGUMENT_THRESHOLD = 2
     if abs(z)/sqrt(abs(ν)+1) < SMALL_ARGUMENT_THRESHOLD
-        
+
     elseif abs(z)/sqrt(abs(ν)+1) > LARGE_ARGUMENT_THRESHOLD
-        
+
     end
 
-    
+
 
     return 1.0
 
