@@ -80,11 +80,6 @@ git-tree-sha1 = "d45c163c7a3ae293c15361acc52882c0f853f97c"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.23.4"
 
-[[EllipsisNotation]]
-git-tree-sha1 = "65dad386e877850e6fce4fc77f60fe75a468ce9d"
-uuid = "da5c29d0-fa7d-589e-88eb-ea29b0a81949"
-version = "0.4.0"
-
 [[FFMPEG]]
 deps = ["BinaryProvider", "Libdl"]
 git-tree-sha1 = "9143266ba77d3313a4cf61d8333a1970e8c5d8b6"
@@ -112,18 +107,6 @@ version = "0.7.7"
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
-[[IntervalSets]]
-deps = ["Dates", "EllipsisNotation", "Statistics"]
-git-tree-sha1 = "8a83c4788fdc2e32d08d90214834ec2dc1a54f57"
-uuid = "8197267c-284f-5f27-9208-e0e47529a953"
-version = "0.4.0"
-
-[[InverseHankelFunction]]
-deps = ["IntervalSets", "LambertW", "SpecialFunctions"]
-path = "/home/jondea/.julia/dev/InverseHankelFunction"
-uuid = "bec4b5d4-d8c4-11e9-2b25-9be465e100f1"
-version = "0.1.0"
-
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
@@ -135,12 +118,6 @@ deps = ["Compat"]
 git-tree-sha1 = "7ab9b8788cfab2bdde22adf9004bda7ad9954b6c"
 uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 version = "1.0.3"
-
-[[LambertW]]
-deps = ["Test"]
-git-tree-sha1 = "ec5a59b498330ac1e5b1c505c46dc53dcefdf90e"
-uuid = "984bce1d-4616-540c-a9ee-88d1112d94c9"
-version = "0.4.3"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"

@@ -77,7 +77,7 @@ end
 function plot_angle_and_contours(ν;lim=5, n_samples=200, save=false, build_dir=".")
     plot_angle_heatmap(z->hankelh1(ν,z); lim=lim, n_samples=n_samples)
     plot_angle_and_abs_contours!(z->hankelh1(ν,z); lim=lim, n_samples=n_samples)
-    plot!(colorbar_title="\$\\mathrm{H}_{$ν}^{(1)}(z)\$")
+    plot!(colorbar_title="\$\\mathrm{arg}(\\mathrm{H}_{$ν}^{(1)}(z))\$")
     if save
         plot!(size=(800,600))
         savefig(joinpath(build_dir,"hankelh1_nu_$(ν)_angle_and_contours.png"))
