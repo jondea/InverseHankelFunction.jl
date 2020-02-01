@@ -10,6 +10,7 @@ makedocs(
         "Home" => "index.md",
         "Example" => "example.md",
         "Asymptotics" => "asymptotics.md",
+        "Branches" => "branches.md",
         "Functions" => "functions.md",
     ]
 )
