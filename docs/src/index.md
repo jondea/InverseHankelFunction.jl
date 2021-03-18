@@ -5,9 +5,9 @@
 CurrentModule = InverseHankelFunction
 ```
 
-## Examples
+## Normalised Hankel Function of First Kind and its Inverse
 ```@contents
-Pages = ["example.md"]
+Pages = ["hankelh1n.md"]
 Depth = 1
 ```
 

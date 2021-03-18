@@ -8,7 +8,7 @@ makedocs(
     sitename="InverseHankelFunction.jl",
     pages=[
         "Home" => "index.md",
-        "Example" => "example.md",
+        "Normalised Hankel Function" => "hankelh1n.md",
         "Asymptotics" => "asymptotics.md",
         "Branches" => "branches.md",
         "Functions" => "functions.md",

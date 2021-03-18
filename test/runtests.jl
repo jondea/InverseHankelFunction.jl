@@ -80,14 +80,14 @@ end
 
     @testset "Sorted Vec optimisation" begin
 
-        hbars = 1.0:-0.01:0.01
+        hns = 1.0:-0.01:0.01
         for z₀ in [1.0, 2.0, 4.0]
             for ν in [0, 1, 4]
                 # Test that the optimised and unoptimise dversion give the same result
-                @test invnormalisedhankelh1.(ν, hbars, z₀) ≈ invnormalisedhankelh1_sortedvec(ν, hbars, z₀)
+                @test invhankelh1n.(ν, z₀, hns) ≈ invhankelh1n_sortedvec(ν, z₀, hns)
                 # Test that optimised version is faster
-                b1 = @benchmark invnormalisedhankelh1.($ν, $hbars, $z₀) samples=10 evals=1
-                b2 = @benchmark invnormalisedhankelh1_sortedvec($ν, $hbars, $z₀) samples=10 evals=1
+                b1 = @benchmark invhankelh1n.($ν, $z₀, $hns) samples=10 evals=1
+                b2 = @benchmark invhankelh1n_sortedvec($ν, $z₀, $hns) samples=10 evals=1
                 @test minimum(b2.times) <= minimum(b1.times)
             end
         end

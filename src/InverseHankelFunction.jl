@@ -5,14 +5,17 @@ import LambertW: lambertw
 
 export invhankelh1, PassingThrough
 
+export hankelh1n,
+       HankelH1N
+
 export diffhankelh1,
        diff2hankelh1,
        diff3hankelh1
 
-export normalisedhankelh1,
-       invnormalisedhankelh1,
-       invnormalisedhankelh1_sortedvec,
-       invnormalisedhankel_adaptive_solve
+export invhankelh1n,
+       invhankelh1n_sortedvec,
+       diffinvhankelh1n_sortedvec,
+       invhankelh1n_adaptive_solve
 
 export hankel_arg_asymptotic_scale,
        small_arg_hankelh1,
@@ -20,9 +23,11 @@ export hankel_arg_asymptotic_scale,
        large_arg_hankelh1,
        inv_large_arg_hankelh1
 
+include("hankelh1n.jl")
+
 include("diffhankel.jl")
 
-include("invnormalisedhankel.jl")
+include("invhankelh1n.jl")
 
 include("hankel_asymptotics.jl")
 

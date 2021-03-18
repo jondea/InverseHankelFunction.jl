@@ -1,39 +1,18 @@
 
-"""
-    normalisedhankelh1(ν, z₀ [,z])
-
-Hankel function normalised at some z₀, H^{(1)}_\\nu(z)/H^{(1)}_\\nu(z₀), returns a function if `z` is not provided
-"""
-function normalisedhankelh1(ν, z₀, z)
-    hankelh1(ν, z) / hankeh1(ν, z₀)
-end
-
-"""
-Struct to cache the value of the hankel function at `z₀`, can be called like a function after construction
-"""
-struct NormalisedHankelH1
-    ν::Complex{Float64}
-    h₀::Complex{Float64}
-end
-
-normalisedhankelh1(ν, z₀) = NormalisedHankelH1(ν, hankeh1(ν, z₀))
-
-(nh::NormalisedHankelH1)(z) = hankelh1(nh.ν, z)/nh.h₀
-
 # "The gradient of the field as an ODE"
 # dtν_dt(field::Field) = - hankel(nh.ν, z) / diffhankelh1(nh.ν, z)
 #
-# dtν_dν(nh::NormalisedHankelH1, z)::Complex = - nh.h₀ / diffhankelh1(nh.ν, z)
+# dtν_dν(nh::HankelH1N, z)::Complex = - nh.h₀ / diffhankelh1(nh.ν, z)
 #
-# dtν_dξ(nh::NormalisedHankelH1, z)::Complex = nh.h₀ / diffhankelh1(nh.ν, z)
+# dtν_dξ(nh::HankelH1N, z)::Complex = nh.h₀ / diffhankelh1(nh.ν, z)
 
 @doc raw"""
-    invnormalisedhankelh1(ν::Integer, h̄::Number, z₀::Number)
+    invhankelh1n(ν::Integer, z₀::Number, h̄::Number)
 
 Find `z` such that ``H^{(1)}_\\nu(z)/H^{(1)}_\\nu(z₀) = \bar{h}`` for the branch continued from `z₀`
-See also: [`normalisedhankelh1`](@ref)
+See also: [`hankelh1n`](@ref)
 """
-function invnormalisedhankelh1(ν, hbar::Number, z₀::Number)
+function invhankelh1n(ν::Integer, z₀::Number, hn::Number)
 
     # SMALL_ARGUMENT_THRESHOLD = 0.5
     # LARGE_ARGUMENT_THRESHOLD = 2
@@ -50,29 +29,63 @@ function invnormalisedhankelh1(ν, hbar::Number, z₀::Number)
     # Now do some numerical continuation until we have reached z, or we are back
     # In a large/small argument asymptotic regime
 
-    return invnormalisedhankel_adaptive_solve(ν, z₀, hbar; householder_order=2, ε=1.0e-15,
-        show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
+    return invhankelh1n_adaptive_solve(ν, z₀, hn; householder_order=2, ε=1.0e-15,
+        show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)[1]
 end
 
-# vector version which reuses
-function invnormalisedhankelh1_sortedvec(ν, hbars::AbstractVector{<:Real}, z₀::Number)
-    zs = similar(hbars, complex(eltype(hbars)))
+# version for a sorted vector of hns, reuses the z from the previous solve for the next one
+function invhankelh1n_sortedvec(ν, z₀::Number, hns::AbstractVector{<:Real})
+    zs = similar(hns, complex(eltype(hns)))
     z = z₀
-    hbar_prev = one(eltype(hbars))
-    for (i,hbar) in enumerate(hbars)
-        z = invnormalisedhankel_adaptive_solve(ν, z₀, hbar, z, hbar_prev)
+    hn_prev = one(eltype(hns))
+    for (i,hn) in enumerate(hns)
+        z = invhankelh1n_adaptive_solve(ν, z₀, hn, z, hn_prev)[1]
         zs[i] = z
-        hbar_prev = hbar
+        hn_prev = hn
     end
     return zs
 end
 
-# function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ::Number)
-#     nh_fnc = normalisedhankelh1(ν, z₀)
-#     invnormalisedhankel_adaptive_solve(nh_fnc::Function, ξ::Number)
+# version for a sorted vector of hns, reuses the z from the previous solve for the next one
+function diffinvhankelh1n_sortedvec(ν, z₀::Number, hns::AbstractVector{<:Real})
+    zs = similar(hns, complex(eltype(hns)))
+    dz_dhns = similar(hns, complex(eltype(hns)))
+    z = z₀
+    hn_prev = one(eltype(hns))
+    for (i,hn) in enumerate(hns)
+        (zs[i], dz_dhns[i]) = invhankelh1n_adaptive_solve(ν, z₀, hn, z, hn_prev)
+        z = zs[i]
+        hn_prev = hn
+    end
+    return zs, dz_dhns
+end
+
+# version for a sorted vector of hns, reuses the z from the previous solve for the next one
+function invhankelh1n(ν, z₀::Number, hns::AbstractVector{<:Real})
+    indices_gt1 = findall(x -> x> 1, hns)
+    indices_le1 = findall(x -> x<=1, hns)
+
+    sortperm_gt1 = sortperm(hns[indices_gt1])
+    sortperm_le1 = sortperm(hns[indices_le1], rev=true)
+
+    zs_gt1 = invhankelh1n_sortedvec(ν, z₀, hns[indices_gt1][sortperm_gt1])
+    zs_le1 = invhankelh1n_sortedvec(ν, z₀, hns[indices_le1][sortperm_le1])
+
+    zs = similar(hns, complex(eltype(hns)))
+
+    # Invert the permutation and the greater than/less than split
+    zs[indices_gt1] .= zs_gt1[invperm(sortperm_gt1)]
+    zs[indices_le1] .= zs_le1[invperm(sortperm_le1)]
+
+    return zs
+end
+
+# function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ::Number)
+#     nh_fnc = hankelh1n(ν, z₀)
+#     invhankelh1n_adaptive_solve(nh_fnc::Function, ξ::Number)
 # end
 
-function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=z₀, ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
+function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=z₀, ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
     show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
 
     h₀ = hankelh1(ν, z₀)
@@ -200,5 +213,5 @@ function invnormalisedhankel_adaptive_solve(ν::Number, z₀::Number, ξ_target:
 
     end
 
-    return z
+    return (z, dζ_dξ)
 end
