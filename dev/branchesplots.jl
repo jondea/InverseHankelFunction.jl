@@ -4,6 +4,8 @@ using InverseHankelFunction
 using LaTeXStrings
 using SpecialFunctions
 
+include("complex_plot_utils.jl")
+
 function plot_branches(ν)
 
     # plot(legend=false, grid=false, aspectratio=1.0)
@@ -24,7 +26,7 @@ function plot_branches(ν)
 
         zs = similar(hs)
         for i in eachindex(zs)
-            zs[i] = invnormalisedhankel_adaptive_solve(ν, z₀, hs[i]/h₀, z, hbar; silent_failure=true)
+            zs[i] = invhankelh1n_adaptive_solve(ν, z₀, hs[i]/h₀, z, hbar; silent_failure=true)
             hbar = hs[i]/h₀
             z = zs[i]
         end
@@ -52,26 +54,6 @@ function plot_q(ν, α;n_samples=200)
 
     plot!(xlims=xlims, ylims=ylims, aspectratio=1.0, xlab=L"\mathrm{Real}(z)", ylab=L"\mathrm{Imag}(z)", colorbar_title=L"\log_{10}(q)")
 
-end
-
-function plot_angle_heatmap(f;lim=5, n_samples=200)
-    x = range(-lim, stop=lim, length=n_samples)
-    y = range(-lim, stop=lim, length=n_samples)
-    heatmap(x, y, (x,y)->angle(f(x+im*y)), color=:colorwheel, xlims=(-lim,lim), ylims=(-lim,lim),
-           clims=(-1π,1π), xlab=L"\mathrm{Re}(z)", ylab=L"\mathrm{Im}(z)", aspectratio=1.0)
-end
-
-function plot_angle_contour(f;lim=5, n_samples=200)
-    x = range(-lim, stop=lim, length=n_samples)
-    y = range(-lim, stop=lim, length=n_samples)
-    contour(x, y, (x,y)->abs(angle(f(x+im*y))), color=:colorwheel, clims=(-1π,1π), xlab=L"\mathrm{Re}(z)", ylab=L"\mathrm{Im}(z)", aspectratio=1.0)
-end
-
-function plot_angle_and_abs_contours!(f;lim=5, n_samples=200)
-    x = range(-lim, stop=lim, length=n_samples)
-    y = range(-lim, stop=lim, length=n_samples)
-    contour!(x, y, (x,y)->angle(f(x+im*y)), color=:white)
-    contour!(x, y, (x,y)->log(abs(f(x+im*y))), color=:black)
 end
 
 function plot_angle_and_contours(ν;lim=5, n_samples=200, save=false, build_dir=".")
