@@ -18,8 +18,13 @@ or alternatively type `] add https://github.com/jondea/InverseHankelFunction.jl`
 in the REPL.
 
 ## Branches
-For a given `h` there are typically many solutions to this equation, so to define
+
+For a given `h` there are typically many solutions to the equation, so to define
 a single valued function, we take two approaches:
-* Define a "normalised" Hankel function hbar(z) = h(z)/h(z_0), and analytically
-  continue our inverse from the point `z_0`
-* Define a branch index (which we denote as `b`) which is 
+* Define a "normalised" Hankel function `hbar(z) = h(z)/h(z_0)`, and analytically
+  continue our inverse from the point `z_0`.
+  This is currently the best studied and most completely implemented approach,
+  and we discuss it (here)[https://jondea.github.io/InverseHankelFunction.jl/dev/hankelh1n].
+* A more general approach is to define a branch index (which we denote as `b`)
+  and find a way to enumerate them.
+  This approach is less well developed, and we discuss it (here)[https://jondea.github.io/InverseHankelFunction.jl/dev/branches].
