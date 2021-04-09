@@ -13,6 +13,7 @@ export diffhankelh1,
        diff3hankelh1
 
 export invhankelh1n,
+       diffinvhankelh1n,
        invhankelh1n_sortedvec,
        diffinvhankelh1n_sortedvec,
        invhankelh1n_adaptive_solve

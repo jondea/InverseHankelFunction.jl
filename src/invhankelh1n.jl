@@ -33,6 +33,19 @@ function invhankelh1n(ν::Integer, z₀::Number, hn::Number)
         show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)[1]
 end
 
+@doc raw"""
+    diffinvhankelh1n(ν::Integer, z₀::Number, h̄::Number)::NTuple{2,Complex}
+
+Find the value and derivative of the inverse normalised Hankel function at `h̄`
+
+Inverse Hankel function is equal to `z` such that ``H^{(1)}_\\nu(z)/H^{(1)}_\\nu(z₀) = \bar{h}``
+for the branch continued from `z₀`. See also: [`hankelh1n`](@ref)
+"""
+function diffinvhankelh1n(ν::Integer, z₀::Number, hn::Number)
+    return invhankelh1n_adaptive_solve(ν, z₀, hn; householder_order=2, ε=1.0e-15,
+        show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
+end
+
 # version for a sorted vector of hns, reuses the z from the previous solve for the next one
 function invhankelh1n_sortedvec(ν, z₀::Number, hns::AbstractVector{<:Real})
     zs = similar(hns, complex(eltype(hns)))
@@ -53,7 +66,7 @@ function diffinvhankelh1n_sortedvec(ν, z₀::Number, hns::AbstractVector{<:Real
     z = z₀
     hn_prev = one(eltype(hns))
     for (i,hn) in enumerate(hns)
-        (zs[i], dz_dhns[i]) = invhankelh1n_adaptive_solve(ν, z₀, hn, z, hn_prev)
+        zs[i], dz_dhns[i] = invhankelh1n_adaptive_solve(ν, z₀, hn, z, hn_prev)
         z = zs[i]
         hn_prev = hn
     end
@@ -85,7 +98,7 @@ end
 #     invhankelh1n_adaptive_solve(nh_fnc::Function, ξ::Number)
 # end
 
-function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=z₀, ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
+function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=complex(z₀), ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
     show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false, iter_vec=missing)
 
     h₀ = hankelh1(ν, z₀)
@@ -232,5 +245,5 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
 
     end
 
-    return (z, dζ_dξ)
+    return z, dζ_dξ
 end

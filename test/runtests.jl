@@ -81,14 +81,31 @@ end
     @testset "Sorted Vec optimisation" begin
 
         hns = 1.0:-0.01:0.01
+        hns = 1.0:-0.1:0.1
         for z₀ in [1.0, 2.0, 4.0]
             for ν in [0, 1, 4]
-                # Test that the optimised and unoptimise dversion give the same result
-                @test invhankelh1n.(ν, z₀, hns) ≈ invhankelh1n_sortedvec(ν, z₀, hns)
-                # Test that optimised version is faster
-                b1 = @benchmark invhankelh1n.($ν, $z₀, $hns) samples=10 evals=1
-                b2 = @benchmark invhankelh1n_sortedvec($ν, $z₀, $hns) samples=10 evals=1
-                @test minimum(b2.times) <= minimum(b1.times)
+                begin
+                    # Test that the optimised and unoptimised versions give the same result
+                    @test invhankelh1n.(ν, z₀, hns) ≈ invhankelh1n_sortedvec(ν, z₀, hns)
+
+                    # Test that optimised version is faster
+                    b1 = @benchmark invhankelh1n.($ν, $z₀, $hns) samples=10 evals=1
+                    b2 = @benchmark invhankelh1n_sortedvec($ν, $z₀, $hns) samples=10 evals=1
+                    @test minimum(b2.times) <= minimum(b1.times)
+                end
+                begin # diff version
+                    # Test that the optimised and unoptimised versions give the same result
+                    unzip(arr) = ([a[1] for a in arr], [a[2] for a in arr])
+                    inv, diff = unzip(diffinvhankelh1n.(ν, z₀, hns))
+                    inv_vec, diff_vec = diffinvhankelh1n_sortedvec(ν, z₀, hns)
+                    @test inv ≈ inv_vec
+                    @test diff ≈ diff_vec
+
+                    # Test that optimised version is faster
+                    b1 = @benchmark diffinvhankelh1n.($ν, $z₀, $hns) samples=10 evals=1
+                    b2 = @benchmark diffinvhankelh1n_sortedvec($ν, $z₀, $hns) samples=10 evals=1
+                    @test minimum(b2.times) <= minimum(b1.times)
+                end
             end
         end
     end
