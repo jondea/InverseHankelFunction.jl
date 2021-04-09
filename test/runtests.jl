@@ -78,7 +78,7 @@ end
 
 @testset "Inverse Normalised Hankel function" begin
 
-    @testset "Sorted Vec optimisation" begin
+    @testset "Vector optimisation" begin
 
         hns = 1.0:-0.01:0.01
         hns = 1.0:-0.1:0.1
@@ -86,12 +86,17 @@ end
             for ν in [0, 1, 4]
                 begin
                     # Test that the optimised and unoptimised versions give the same result
-                    @test invhankelh1n.(ν, z₀, hns) ≈ invhankelh1n_sortedvec(ν, z₀, hns)
+                    naive_method = invhankelh1n.(ν, z₀, hns)
+                    @test naive_method ≈ invhankelh1n_sortedvec(ν, z₀, hns)
+                    @test naive_method ≈ invhankelh1n(ν, z₀, hns)
 
-                    # Test that optimised version is faster
+                    # Test that vector optimised versions are faster (note no broadcasting on b3)
                     b1 = @benchmark invhankelh1n.($ν, $z₀, $hns) samples=10 evals=1
                     b2 = @benchmark invhankelh1n_sortedvec($ν, $z₀, $hns) samples=10 evals=1
+                    b3 = @benchmark invhankelh1n($ν, $z₀, $hns) samples=10 evals=1
+
                     @test minimum(b2.times) <= minimum(b1.times)
+                    @test minimum(b3.times) <= minimum(b1.times)
                 end
                 begin # diff version
                     # Test that the optimised and unoptimised versions give the same result
@@ -108,6 +113,15 @@ end
                 end
             end
         end
+    end
+
+    @testset "Unsorted Vec function" begin
+        # Deliberately unsorted vec
+        hns = [0.4, 0.1, 1.1, 0.9, 1.7]
+        z₀ = 1.3
+        ν = 4
+        naive_method = invhankelh1n.(ν, z₀, hns)
+        @test naive_method ≈ invhankelh1n(ν, z₀, hns)
     end
 
     @testset "Householder corrector orders" begin
