@@ -86,7 +86,7 @@ end
 # end
 
 function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number, z::Number=z₀, ξ::Number=one(ξ_target); householder_order=2, ε=1.0e-12,
-    show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
+    show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false, iter_vec=missing)
 
     h₀ = hankelh1(ν, z₀)
 
@@ -97,8 +97,8 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
     ζ = z - z₀
 
     h = hankelh1(ν, z)
-    h_ν_minus_1 = hankelh1(ν-1, z)
-    dh_dζ = h_ν_minus_1 - ν/z*h
+    h_m1 = hankelh1(ν-1, z)
+    dh_dζ = h_m1 - ν/z*h
 
     # Tangent of ζ/z
     dζ_dξ = h₀/dh_dζ
@@ -135,8 +135,8 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
         # Calculate new point (z) and hankel function/its derivatives at new point
         z = z₀ + ζ
         h = hankelh1(ν, z)
-        h_ν_minus_1 = hankelh1(ν-1, z)
-        dh_dζ = h_ν_minus_1 - ν/z*h
+        h_m1 = hankelh1(ν-1, z)
+        dh_dζ = h_m1 - ν/z*h
 
         residual = h/h₀ - ξ
 
@@ -150,15 +150,30 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
             if householder_order == 1
                 ζ = ζ + δ
             elseif householder_order == 2
-                h_ν_minus_2 = hankelh1(ν-2, z)
-                dh_ν_minus_1_dζ = h_ν_minus_2 - (ν-1)/z*h_ν_minus_1
-                d2residual_dζ2 = dh_ν_minus_1_dζ -ν/z*dh_dζ + ν/z^2*h
+                h_m2 = hankelh1(ν-2, z)
+
+                dh_m1_dζ = h_m2 - (ν-1)/z*h_m1
+
+                d2h_dζ2 = dh_m1_dζ - ν/z*dh_dζ + ν/z^2*h
+
+                d2residual_dζ2 = d2h_dζ2/h₀
+
                 ζ = ζ + δ*(1 + δ*(d2residual_dζ2/(2*dresidual_dζ)))^-1
             elseif householder_order == 3
-                h_ν_minus_2 = hankelh1(ν-2, z)
-                dh_ν_minus_1_dζ = h_ν_minus_2 - (ν-1)/z*h_ν_minus_1
-                d2residual_dζ2 = dh_ν_minus_1_dζ -ν/z*dh_dζ + ν/z^2*h
-                error("Implement d3residual_dζ3")
+                h_m2 = hankelh1(ν-2, z)
+                h_m3 = hankelh1(ν-3, z)
+
+                dh_m1_dζ = h_m2 - (ν-1)/z*h_m1
+                dh_m2_dζ = h_m3 - (ν-2)/z*h_m2
+
+                d2h_dζ2    = dh_m1_dζ - ν/z*dh_dζ    + ν/z^2*h
+                d2h_m1_dζ2 = dh_m2_dζ - (ν-1)/z*dh_m1_dζ + (ν-1)/z^2*h_m1
+
+                d3h_dζ3 = d2h_m1_dζ2 + 2ν/z^2*dh_dζ - ν/z*d2h_dζ2 - 2ν/z^3*h
+
+                d2residual_dζ2 = d2h_dζ2/h₀
+                d3residual_dζ3 = d3h_dζ3/h₀
+
                 ζ = ζ + δ*(1 + δ*(d2residual_dζ2/(2*dresidual_dζ))) / (1 + (d2residual_dζ2/dresidual_dζ)*δ + 1//6*(d3residual_dζ3/dresidual_dζ)*δ^2)
             else
                 error("Householder order $householder_order not implemented. Use 1, 2 or 3.")
@@ -167,8 +182,8 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
             # Calculate new point (z) and hankel function/its derivatives at new point
             z = z₀ + ζ
             h = hankelh1(ν, z)
-            h_ν_minus_1 = hankelh1(ν-1, z)
-            dh_dζ = h_ν_minus_1 - ν/z*h
+            h_m1 = hankelh1(ν-1, z)
+            dh_dζ = h_m1 - ν/z*h
 
             residual = h/h₀ - ξ
 
@@ -177,6 +192,10 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
             if iter > N_iter_max
                 break
             end
+        end
+
+        if !ismissing(iter_vec)
+            push!(iter_vec, iter)
         end
 
         # Get tangent of ζ/z at new point
