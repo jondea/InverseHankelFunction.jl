@@ -96,8 +96,8 @@ end
     @test hankelh1n(ν, z₀, z₀) ≈ 1
 
     # Cached version should be faster
-    b1 = @benchmark hankelh1n($ν, $z₀, $z)($ν, $z₀, $hns) samples=20 evals=1
-    b2 = @benchmark hn1_partial($z) samples=20 evals=1
+    b1 = @benchmark hankelh1n($ν, $z₀, $z) samples=20 evals=1
+    b2 = @benchmark $hn1_partial($z) samples=20 evals=1
     @test minimum(b2.times) <= minimum(b1.times)
 end
 
