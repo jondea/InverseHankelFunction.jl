@@ -37,6 +37,10 @@ include("utils.jl")
                 end
             end
         end
+        @testset "Domain enforcement for ν=0" begin
+            @test_throws DomainError inv_small_arg_hankelh1(0, 3.1+0.1im, 6)
+            @test_throws DomainError inv_small_arg_hankelh1(0, -1.01-0.7im, 9)
+        end
 
     end
 
@@ -72,6 +76,33 @@ include("utils.jl")
             end
         end
 
+    end
+
+    @testset "Asymptotic scale" begin
+        # Small |z| is small
+        @test hankel_arg_asymptotic_scale(0, 0.001  ) < 1/2
+        @test hankel_arg_asymptotic_scale(4, -0.001 ) < 1/2
+        @test hankel_arg_asymptotic_scale(5, 0.001im) < 1/2
+
+        # Big |z| is big
+        @test hankel_arg_asymptotic_scale(0,  10000 ) > 2
+        @test hankel_arg_asymptotic_scale(9, -10000 ) > 2
+        @test hankel_arg_asymptotic_scale(3, -1000im) > 2
+
+        # Decreasing in |ν|
+        @test   2 < hankel_arg_asymptotic_scale(0  , 3)
+        @test 1/2 < hankel_arg_asymptotic_scale( 20, 3) < 2
+        @test       hankel_arg_asymptotic_scale(450, 3) < 1/2
+
+        @test   2 < hankel_arg_asymptotic_scale(0  ,   -3)
+        @test 1/2 < hankel_arg_asymptotic_scale(-20,    3) < 2
+        @test       hankel_arg_asymptotic_scale(450im,  3) < 1/2
+
+        # Although |z| dominates for large |z|
+        @test hankel_arg_asymptotic_scale( 100,  100  ) > 2
+        @test hankel_arg_asymptotic_scale( 100, -100  ) > 2
+        @test hankel_arg_asymptotic_scale(-100, -100im) > 2
+        @test hankel_arg_asymptotic_scale( 100, -100im) > 2
     end
 
 end
