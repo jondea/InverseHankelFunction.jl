@@ -107,7 +107,7 @@ include("utils.jl")
 
 end
 
-@testset "Normalised Hankel function" begin
+@testset "Normalised Hankel function        " begin
     ν = 1
     z₀ = 2.0 - 0.3im
     z = 2.0 + 0.1im
@@ -235,6 +235,46 @@ end
     @testset "Too many steps kill switch" begin
         @test typeof(invhankelh1n_adaptive_solve(0, 1.0, 0; silent_failure=true)) <: Tuple
         @test_throws Exception invhankelh1n_adaptive_solve(0, 1.0, 0; silent_failure=false)
+    end
+
+end
+
+@testset "Passing through                   " begin
+    for ν in [0, 1, 4]
+        for p in PassingThrough.([1.0, 2.0, 4.0, 1.0+0.5im, 2.0-0.2im])
+            h(z) = hankelh1(ν, z)
+            h⁻¹(z) = invhankelh1(ν, z, p)
+
+            # Check that invhankelh1 does indeed pass through this point
+            @test h⁻¹(h(p.point)) ≈ p.point
+
+            for hz in [0.9, 0.34, 0.01, 1.4, 1.0-0.5im]
+                h⁻¹hz = h⁻¹(hz)
+                @test h(h⁻¹hz) ≈ hz
+            end
+        end
+    end
+
+    @testset "Domain errors" begin
+        ν = 4
+        h = 3.4 + 0.1im
+
+        # NaNs
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(NaN - 1.0*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(NaN - Inf*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(NaN - NaN*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(10  - NaN*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(NaN))
+
+        # Any kind of infinity
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(Inf + 0im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(1.0 + Inf*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(Inf + -Inf*im))
+
+        # Zeros
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough( 0.0 + 0.0*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough( 0.0 - 0.0*im))
+        @test_throws DomainError invhankelh1(ν, h, PassingThrough(-0.0 - 0.0*im))
     end
 
 end

@@ -3,7 +3,11 @@ module InverseHankelFunction
 import SpecialFunctions: hankelh1, gamma
 import LambertW: lambertw
 
-export invhankelh1, PassingThrough
+export invhankelh1,
+       PassingThrough,
+       isfinite,
+       iszero,
+       isnan
 
 export hankelh1n,
        HankelH1N
@@ -33,5 +37,7 @@ include("invhankelh1n.jl")
 include("hankel_asymptotics.jl")
 
 include("invhankel.jl")
+
+include("passingthrough.jl")
 
 end # module
