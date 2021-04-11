@@ -24,6 +24,8 @@ a single valued function, we take two approaches:
   continue our inverse from the point `z_0`.
   This is currently the best studied and most completely implemented approach,
   and we discuss it (here)[hankelh1n].
+  In a related way, we also define the inverse Hankel function which "passes
+  through" `z_0` using the interface `invhankelh1(ν, h, PassingThrough(z_0))`.
 * A more general approach is to define a branch index (which we denote as `b`)
   and find a way to ennumerate them.
   This approach is less well developed, and we discuss it (here)[branches].
