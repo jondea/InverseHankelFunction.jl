@@ -1,2 +1,5 @@
 
 build/
+*.cov
+coverage/
+.vscode/
