@@ -10,7 +10,7 @@ Struct to cache the value of the Hankel function of the first kind at `z₀`, ca
 """
 struct HankelH1N
     "Order of the normalised Hankel function"
-    ν::Complex{Float64}
+    ν::Float64
     "Normalise the Hankel function everywhere by the value of the Hankel function at this point in complex space"
     z₀::Complex{Float64}
     "Hankel function evaluated at z₀, we use this value to normalise the Hankel function"

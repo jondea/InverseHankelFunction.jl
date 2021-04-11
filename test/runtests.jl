@@ -76,6 +76,31 @@ include("utils.jl")
 
 end
 
+@testset "Normalised Hankel function" begin
+    ν = 1
+    z₀ = 2.0 - 0.3im
+    z = 2.0 + 0.1im
+
+    # Construct the partially evaluated version, which caches the value of hankel at z₀
+    hn1_partial = hankelh1n(1, z₀)
+
+    # Should be equal when we evaluate in stages or at once
+    @test hn1_partial(z) ≈ hankelh1n(ν, z₀, z)
+
+    # Check it isn't trivial
+    @test hn1_partial(z) != 1
+    @test hankelh1n(ν, z₀, z) != 1
+
+    # Normalised function evaluated at z₀ will always be 1.0
+    @test hn1_partial(z₀) ≈ 1
+    @test hankelh1n(ν, z₀, z₀) ≈ 1
+
+    # Cached version should be faster
+    b1 = @benchmark hankelh1n($ν, $z₀, $z)($ν, $z₀, $hns) samples=20 evals=1
+    b2 = @benchmark hn1_partial($z) samples=20 evals=1
+    @test minimum(b2.times) <= minimum(b1.times)
+end
+
 @testset "Inverse Normalised Hankel function" begin
 
     @testset "Vector optimisation" begin
