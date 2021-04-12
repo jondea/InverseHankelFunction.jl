@@ -10,7 +10,7 @@ These points are multiple solutions (`z`) for a particular value of the the
 Hankel function (`h`).
 
 As we increase the order of the Hankel function (which we will denote by `m`),
-we see the small argument (`z≈0`) (asymptotics)[asymptotics] become clearer,
+we see the small argument (`z≈0`) [asymptotics](asymptotics) become clearer,
 with a zero of multiplicity equal to `m`.
 Therefore around `z=0` we see that there will be at least `m` branches of the
 inverse of the Hankel function.
