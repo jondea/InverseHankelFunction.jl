@@ -237,6 +237,16 @@ end
         @test_throws Exception invhankelh1n_adaptive_solve(0, 1.0, 0; silent_failure=false)
     end
 
+    @testset "Test convergence         " begin
+        # Test that these converge (i.e. don't throw)
+        # These were some tough cases that failed to converge due to bug
+        diffinvhankelh1n(3, 0.2, 0.83060469323313)
+        diffinvhankelh1n(0, 20.0, 0.83060469323313)
+        diffinvhankelh1n(3, 0.2, 0.915302346616566)
+        diffinvhankelh1n(3, 20.0, 0.983117378550789)
+        @test true
+    end
+
 end
 
 @testset "Passing through                   " begin

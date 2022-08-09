@@ -42,8 +42,7 @@ Inverse Hankel function is equal to `z` such that ``H^{(1)}_\\nu(z)/H^{(1)}_\\nu
 for the branch continued from `z₀`. See also: [`hankelh1n`](@ref)
 """
 function diffinvhankelh1n(ν::Integer, z₀::Number, hn::Number)
-    return invhankelh1n_adaptive_solve(ν, z₀, hn; householder_order=2, ε=1.0e-15,
-        show_trace=false, step_max=0.1, ζ_jump_max=0.5, dζ_dξ_angle_jump_max=π/8, N_iter_max=10, silent_failure=false)
+    return invhankelh1n_adaptive_solve(ν, z₀, hn; silent_failure=false)
 end
 
 # version for a sorted vector of hns, reuses the z from the previous solve for the next one
@@ -122,7 +121,7 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
     ξ_prev = ξ
 
     # Try to guess what will be a good size for the next step without going past our max
-    ξ_step = sign(ξ_target-ξ)*min(step_max, 0.9*ζ_jump_max/abs.(dh_dζ), abs(ξ_target-ξ))
+    ξ_step = sign(ξ_target-ξ)*min(step_max, 0.9*ζ_jump_max/abs.(dζ_dξ), abs(ξ_target-ξ))
 
     # Keep going until we get to our target
     while abs(ξ_target-ξ) > 0
@@ -225,7 +224,7 @@ function invhankelh1n_adaptive_solve(ν::Number, z₀::Number, ξ_target::Number
             && abs(residual) <= ε )
 
             # Reset stepsize, try to guess what will be a good size for the next step without going past our max
-            ξ_step = sign(ξ_target-ξ)*min(step_max, 0.9*ζ_jump_max/abs.(dh_dζ), abs(ξ_target-ξ))
+            ξ_step = sign(ξ_target-ξ)*min(step_max, 0.9*ζ_jump_max/abs.(dζ_dξ), abs(ξ_target-ξ))
 
             # Store current as the starting point for next step
             dζ_dξ_prev = dζ_dξ
